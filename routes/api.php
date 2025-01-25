@@ -6,14 +6,14 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SubactivityController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\Cors;
+use App\Http\Middleware\CorsMiddleware;
 
-Route::middleware([Cors::class])->group(function () {
+Route::middleware([CorsMiddleware::class])->group(function () {
 
     // endpoints de proyectos
     Route::get('getAll', [ProjectController::class, 'getAll']);
     Route::post('saveProject', [ProjectController::class, 'saveProject']);
-    Route::get('/projects/{id}/details', [ProjectController::class, 'getProjectDetails']);
+    Route::get('projects/{id}/details', [ProjectController::class, 'getProjectDetails']);
 
     // endpoints de categorias
     Route::get('getAllCategories', [CategoryController::class, 'getAll']);
