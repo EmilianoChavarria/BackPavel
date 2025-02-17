@@ -15,6 +15,19 @@ class SubactivityController extends Controller
         return response()->json(['subactivities' => $subactivities, 'status' => 200], 200);
     }
 
+    public function getByActivity($id)
+    {
+        try {
+            $data = DB::table('subactivities')->where('activity_id', $id)->get();
+            return response()->json(['subactivities' => $data, 'status' => 200], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar la actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function saveSubactivity(Request $request)
     {
         try {

@@ -31,6 +31,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::delete('deleteActivity/{id}', [ActivityController::class, 'deleteActivity']);
 
     // endpoints de subactividades
+    Route::get('getSubactivitiesByActivity/{id}', [SubactivityController::class, 'getByActivity']);
     Route::get('getAllSubactivities', [SubactivityController::class, 'getAll']);
     Route::post('saveSubactivity', [SubActivityController::class, 'saveSubActivity']);
     Route::put('completeSubactivity/{id}', [SubactivityController::class, 'completeSubactivity']);

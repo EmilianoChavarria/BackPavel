@@ -79,17 +79,7 @@ class ProjectController extends Controller
                     ->where('activities.category_id', $category->id)
                     ->select('activities.*', 'users.name as responsible_name')
                     ->leftJoin('users', 'activities.responsible_id', '=', 'users.id')
-                    ->get()
-                    ->map(function ($activity) {
-                        // Obtener subactividades relacionadas con la actividad
-                        $subactivities = DB::table('subactivities')
-                            ->where('subactivities.activity_id', $activity->id)
-                            ->select('subactivities.*')
-                            ->get();
-
-                        $activity->subactivities = $subactivities;
-                        return $activity;
-                    });
+                    ->get();
 
                 $category->activities = $activities;
                 return $category;
