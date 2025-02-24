@@ -13,7 +13,10 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     // endpoints de proyectos
     Route::get('getAll', [ProjectController::class, 'getAll']);
     Route::post('saveProject', [ProjectController::class, 'saveProject']);
+    Route::put('updateProject/{id}', [ProjectController::class, 'updateProject']);
+    Route::delete('deleteProject/{id}', [ProjectController::class, 'deleteProject']);
     Route::get('projects/{id}/details', [ProjectController::class, 'getProjectDetails']);
+    Route::get('findOneProject/{id}', [ProjectController::class, 'findOne']);
 
     // endpoints de categorias
     Route::get('getAllCategories', [CategoryController::class, 'getAll']);
