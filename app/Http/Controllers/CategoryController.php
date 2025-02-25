@@ -14,6 +14,13 @@ class CategoryController extends Controller
         return response()->json(['categories' => $categories, 'status' => 200], 200);
     }
 
+    public function findOne($id)
+    {
+        $projects = DB::table('categories')->where('id', $id)->get();
+        return response()->json(['categoryInfo' => $projects, 'status' => 200], 200);
+
+    }
+
     public function getCategoriesByProject($id){
         $categories = DB::table('categories')->where('project_id', $id)->get();
         return response()->json(['categories' => $categories, 'status' => 200], 200);
