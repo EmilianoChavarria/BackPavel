@@ -23,6 +23,8 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('getCategoriesByProject/{id}', [CategoryController::class, 'getCategoriesByProject']);
     Route::post('saveCategory', [CategoryController::class, 'saveCategory']);
     Route::get('findOneCategory/{id}', action: [CategoryController::class, 'findOne']);
+    Route::put('updateCategory/{id}', [CategoryController::class, 'updateCategory']);
+    Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
 
 
     // endpoints de usuarios
