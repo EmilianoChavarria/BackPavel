@@ -29,6 +29,9 @@ Route::middleware([CorsMiddleware::class])->group(function () {
 
     // endpoints de usuarios
     Route::get('getAllUsers', [UserController::class, 'getAll']);
+    Route::get('getRoles', [UserController::class, 'getRoles']);
+    Route::get('getDepartments', [UserController::class, 'getDepartments']);
+    Route::get('getPositions', [UserController::class, 'getPositions']);
     Route::post('saveUser', [UserController::class, 'saveUser']);
 
     // endpoints de actividades
