@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\DB;
 class UserController extends Controller
 {
 
+    public function findOne($id)
+    {
+        $projects = DB::table('users')->where('id', $id)->get();
+        return response()->json(['user' => $projects, 'status' => 200], 200);
+    }
+
     public function getAll()
     {
         try {

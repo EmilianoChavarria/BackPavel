@@ -25,13 +25,14 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('findOneCategory/{id}', action: [CategoryController::class, 'findOne']);
     Route::put('updateCategory/{id}', [CategoryController::class, 'updateCategory']);
     Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
-
-
+    
+    
     // endpoints de usuarios
     Route::get('getAllUsers', [UserController::class, 'getAll']);
     Route::get('getRoles', [UserController::class, 'getRoles']);
     Route::get('getDepartments', [UserController::class, 'getDepartments']);
     Route::get('getPositions', [UserController::class, 'getPositions']);
+    Route::get('findOneUser/{id}', action: [UserController::class, 'findOne']);
     Route::post('saveUser', [UserController::class, 'saveUser']);
 
     // endpoints de actividades
