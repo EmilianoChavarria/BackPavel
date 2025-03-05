@@ -17,7 +17,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::delete('deleteProject/{id}', [ProjectController::class, 'deleteProject']);
     Route::get('projects/{id}/details', [ProjectController::class, 'getProjectDetails']);
     Route::get('findOneProject/{id}', action: [ProjectController::class, 'findOne']);
-
+    
     // endpoints de categorias
     Route::get('getAllCategories', [CategoryController::class, 'getAll']);
     Route::get('getCategoriesByProject/{id}', [CategoryController::class, 'getCategoriesByProject']);
@@ -34,7 +34,9 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('getPositions', [UserController::class, 'getPositions']);
     Route::get('findOneUser/{id}', action: [UserController::class, 'findOne']);
     Route::post('saveUser', [UserController::class, 'saveUser']);
-
+    Route::put('updateUser/{id}', [UserController::class, 'updateUser']);
+    Route::delete('deleteUser/{id}', [UserController::class, 'deleteUser']);
+    
     // endpoints de actividades
     Route::get('getAllActivities', [ActivityController::class, 'getAll']);
     Route::post('saveActivity', [ActivityController::class, 'saveActivity']);

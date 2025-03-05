@@ -124,4 +124,57 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function updateUser(Request $request, $id)
+    {
+        try {
+            // Verificar si el usuario existe
+            $user = DB::table('users')->where('id', $id)->first();
+            if (!$user) {
+                return response()->json(['message' => 'Usuario no encontrado'], 404);
+            }
+
+            // Filtrar solo los datos que se enviaron en la solicitud
+            $data = $request->only(['name', 'email', 'status', 'department_id', 'position_id', 'role_id']);
+
+            // Si no hay datos para actualizar, devolver un mensaje
+            if (empty($data)) {
+                return response()->json(['message' => 'No se enviaron datos para actualizar'], 400);
+            }
+
+            // Actualizar el usuario
+            DB::table('users')->where('id', $id)->update($data);
+
+            return response()->json(['message' => 'Usuario actualizado correctamente'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el usuario',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteUser($id)
+    {
+        try {
+            // Verificar si el usuario existe
+            $user = DB::table('users')->where('id', $id)->first();
+            if (!$user) {
+                return response()->json(['message' => 'Usuario no encontrado'], 404);
+            }
+
+            // Eliminar el usuario
+            DB::table('users')->where('id', $id)->delete();
+
+            return response()->json(['message' => 'Usuario eliminado correctamente'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar el usuario',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
 }
