@@ -39,6 +39,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     
     // endpoints de actividades
     Route::get('getAllActivities', [ActivityController::class, 'getAll']);
+    Route::get('findOneActivity/{id}', [ActivityController::class, 'findOneActivity']);
     Route::post('saveActivity', [ActivityController::class, 'saveActivity']);
     Route::put('completeActivity/{id}', [ActivityController::class, 'completeActivity']);
     Route::delete('deleteActivity/{id}', [ActivityController::class, 'deleteActivity']);
@@ -48,6 +49,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('getAllSubactivities', [SubactivityController::class, 'getAll']);
     Route::post('saveSubactivity', [SubActivityController::class, 'saveSubActivity']);
     Route::put('completeSubactivity/{id}', [SubactivityController::class, 'completeSubactivity']);
+    Route::put('updateSubactivity/{id}', [SubactivityController::class, 'updateSubactivity']);
     Route::delete('deleteSubactivity/{id}', [SubactivityController::class, 'deleteSubactivity']);
 
 });

@@ -15,6 +15,12 @@ class ActivityController extends Controller
         return response()->json(['actividades' => $actividades, 'status' => 200], 200);
     }
 
+    public function findOneActivity($id)
+    {
+        $activity = DB::table('activities')->where('id', $id)->get();
+        return response()->json(['activity' => $activity, 'status' => 200], 200);
+    }
+
     public function saveActivity(Request $request)
     {
         try {

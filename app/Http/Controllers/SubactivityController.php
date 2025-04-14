@@ -95,6 +95,60 @@ class SubactivityController extends Controller
         }
     }
 
+    public function updateSubactivity(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'name' => 'sometimes|required',
+                'comment' => 'sometimes|nullable',
+                'status' => 'sometimes|required|in:completada,no completada',
+            ], [
+                'name.required' => 'El nombre de la subactividad es requerido cuando se proporciona.',
+                'status.required' => 'El estado de la subactividad es requerido cuando se proporciona.',
+                'status.in' => 'El estado debe ser "completada" o "no completada".',
+            ]);
+
+            $updateData = [];
+
+            if ($request->has('name')) {
+                $updateData['name'] = $request->name;
+            }
+
+            if ($request->has('comment')) {
+                $updateData['comment'] = $request->comment;
+            }
+
+            if ($request->has('status')) {
+                $updateData['status'] = $request->status;
+            }
+
+            if (empty($updateData)) {
+                return response()->json([
+                    'message' => 'No se proporcionaron datos para actualizar',
+                    'status' => 400,
+                ], 400);
+            }
+
+            DB::table('subactivities')->where('id', $id)->update($updateData);
+
+            return response()->json([
+                'message' => 'Subactividad actualizada correctamente',
+                'status' => 200,
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar la subactividad',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function deleteSubactivity($id)
     {
         try {
