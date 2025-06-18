@@ -16,10 +16,18 @@ class ActivityController extends Controller
     }
 
     public function findOneActivity($id)
-    {
-        $activity = DB::table('activities')->where('id', $id)->get();
-        return response()->json(['activity' => $activity, 'status' => 200], 200);
-    }
+{
+    $activity = DB::table('activities')
+                ->leftJoin('users', 'activities.responsible_id', '=', 'users.id')
+                ->where('activities.id', $id)
+                ->select('activities.*', 'users.name as responsible_name')
+                ->first();
+                
+    return response()->json([
+        'activity' => $activity,
+        'status' => 200
+    ], 200);
+}
 
     public function saveActivity(Request $request)
     {
@@ -69,6 +77,38 @@ class ActivityController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al crear la actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function saveMessage(Request $request)
+    {
+        try {
+            $request->validate([
+                'content' => 'required',
+                'activity_id' => 'required',
+            ], [
+                
+                'content.required' => 'El mensaje es requerido.',
+                'activity_id.required' => 'El activity_id es requerido.',
+                
+            ]);
+
+            DB::table('messages_activities')->insert([
+                'content' => $request->content,
+                'activity_id' => $request->activity_id
+            ]);
+
+            return response()->json(['message' => 'Mensaje enviado correctamente', 'status' => 200], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al enviar el mensaje',
                 'error' => $e->getMessage()
             ], 500);
         }

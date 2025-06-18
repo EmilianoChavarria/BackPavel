@@ -41,6 +41,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('getAllActivities', [ActivityController::class, 'getAll']);
     Route::get('findOneActivity/{id}', [ActivityController::class, 'findOneActivity']);
     Route::post('saveActivity', [ActivityController::class, 'saveActivity']);
+    Route::post('sendMessage', [ActivityController::class, 'saveMessage']);
     Route::put('completeActivity/{id}', [ActivityController::class, 'completeActivity']);
     Route::delete('deleteActivity/{id}', [ActivityController::class, 'deleteActivity']);
 

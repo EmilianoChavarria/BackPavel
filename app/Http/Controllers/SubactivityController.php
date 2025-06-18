@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SubactivityController extends Controller
 {
@@ -98,53 +99,62 @@ class SubactivityController extends Controller
     public function updateSubactivity(Request $request, $id)
     {
         try {
-            $request->validate([
-                'name' => 'sometimes|required',
-                'comment' => 'sometimes|nullable',
+
+            // var_dump($request);
+            // Log de request
+            Log::error('Error actualizando subactividad: ' . $request);
+
+            // Validación
+            $validated = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'comment' => 'sometimes|nullable|string',
                 'status' => 'sometimes|required|in:completada,no completada',
             ], [
-                'name.required' => 'El nombre de la subactividad es requerido cuando se proporciona.',
-                'status.required' => 'El estado de la subactividad es requerido cuando se proporciona.',
+                'name.required' => 'El nombre es requerido cuando se proporciona.',
                 'status.in' => 'El estado debe ser "completada" o "no completada".',
             ]);
 
-            $updateData = [];
-
-            if ($request->has('name')) {
-                $updateData['name'] = $request->name;
-            }
-
-            if ($request->has('comment')) {
-                $updateData['comment'] = $request->comment;
-            }
-
-            if ($request->has('status')) {
-                $updateData['status'] = $request->status;
-            }
-
-            if (empty($updateData)) {
+            // Verificar si hay datos para actualizar
+            if (empty($validated)) {
                 return response()->json([
-                    'message' => 'No se proporcionaron datos para actualizar',
+                    'message' => 'No se proporcionaron datos válidos para actualizar',
                     'status' => 400,
                 ], 400);
             }
 
-            DB::table('subactivities')->where('id', $id)->update($updateData);
+            // Verificar si la subactividad existe
+            $exists = DB::table('subactivities')->where('id', $id)->exists();
+            if (!$exists) {
+                return response()->json([
+                    'message' => 'Subactividad no encontrada',
+                    'status' => 404,
+                ], 404);
+            }
+
+            // Actualización
+            $affected = DB::table('subactivities')
+                ->where('id', $id)
+                ->update($validated);
 
             return response()->json([
                 'message' => 'Subactividad actualizada correctamente',
+                'affected_rows' => $affected,
                 'status' => 200,
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'message' => 'Error en la validación de datos',
+                'message' => 'Error de validación',
                 'errors' => $e->errors(),
+                'status' => 422,
             ], 422);
+
         } catch (\Exception $e) {
+            Log::error('Error actualizando subactividad: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error al actualizar la subactividad',
-                'error' => $e->getMessage(),
+                'message' => 'Error interno del servidor',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Contacte al administrador',
+                'status' => 500,
             ], 500);
         }
     }

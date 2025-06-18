@@ -18,7 +18,7 @@ class UserController extends Controller
     public function getAll()
     {
         try {
-            $users = DB::table('user_details')->get();
+            $users = DB::table(table: 'user_details')->get();
 
             return response()->json([
                 'users' => $users,
