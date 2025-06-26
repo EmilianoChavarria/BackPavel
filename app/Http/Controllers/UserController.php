@@ -173,7 +173,7 @@ class UserController extends Controller
 
             return response()->json([
                 'message' => 'Cargo creado correctamente',
-                'status' => 200
+                'status' => 200,
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
