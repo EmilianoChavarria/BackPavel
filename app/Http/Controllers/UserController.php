@@ -125,6 +125,70 @@ class UserController extends Controller
         }
     }
 
+    public function saveDepartment(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:departments,name',
+            ], [
+                'name.required' => 'El nombre del departamento es requerido.',
+                'name.unique' => 'Este departamento ya existe.',
+            ]);
+
+            DB::table('departments')->insert([
+                'name' => $request->name,
+            ]);
+
+            return response()->json([
+                'message' => 'Departamento creado correctamente',
+                'status' => 200
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear el departamento',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function savePosition(Request $request)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255|unique:positions,title',
+            ], [
+                'title.required' => 'El título del cargo es requerido.',
+                'title.unique' => 'Este cargo ya existe.',
+            ]);
+
+            DB::table('positions')->insert([
+                'title' => $request->title,
+            ]);
+
+            return response()->json([
+                'message' => 'Cargo creado correctamente',
+                'status' => 200
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear el cargo',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function updateUser(Request $request, $id)
     {
         try {

@@ -17,7 +17,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::delete('deleteProject/{id}', [ProjectController::class, 'deleteProject']);
     Route::get('projects/{id}/details', [ProjectController::class, 'getProjectDetails']);
     Route::get('findOneProject/{id}', action: [ProjectController::class, 'findOne']);
-    
+
     // endpoints de categorias
     Route::get('getAllCategories', [CategoryController::class, 'getAll']);
     Route::get('getCategoriesByProject/{id}', [CategoryController::class, 'getCategoriesByProject']);
@@ -25,8 +25,8 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('findOneCategory/{id}', action: [CategoryController::class, 'findOne']);
     Route::put('updateCategory/{id}', [CategoryController::class, 'updateCategory']);
     Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
-    
-    
+
+
     // endpoints de usuarios
     Route::get('getAllUsers', [UserController::class, 'getAll']);
     Route::get('getRoles', [UserController::class, 'getRoles']);
@@ -34,9 +34,12 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('getPositions', [UserController::class, 'getPositions']);
     Route::get('findOneUser/{id}', action: [UserController::class, 'findOne']);
     Route::post('saveUser', [UserController::class, 'saveUser']);
+    Route::post('saveDepartment', [UserController::class, 'saveDepartment']);
+    Route::post('savePositions', [UserController::class, 'savePosition']);
     Route::put('updateUser/{id}', [UserController::class, 'updateUser']);
     Route::delete('deleteUser/{id}', [UserController::class, 'deleteUser']);
-    
+
+
     // endpoints de actividades
     Route::get('getAllActivities', [ActivityController::class, 'getAll']);
     Route::get('findOneActivity/{id}', [ActivityController::class, 'findOneActivity']);
