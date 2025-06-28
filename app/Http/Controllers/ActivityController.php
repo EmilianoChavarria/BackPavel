@@ -10,24 +10,25 @@ class ActivityController extends Controller
 {
     //
 
-    public function getAll(){
+    public function getAll()
+    {
         $actividades = DB::table('activities')->get();
         return response()->json(['actividades' => $actividades, 'status' => 200], 200);
     }
 
     public function findOneActivity($id)
-{
-    $activity = DB::table('activities')
-                ->leftJoin('users', 'activities.responsible_id', '=', 'users.id')
-                ->where('activities.id', $id)
-                ->select('activities.*', 'users.name as responsible_name')
-                ->first();
-                
-    return response()->json([
-        'activity' => $activity,
-        'status' => 200
-    ], 200);
-}
+    {
+        $activity = DB::table('activities')
+            ->leftJoin('users', 'activities.responsible_id', '=', 'users.id')
+            ->where('activities.id', $id)
+            ->select('activities.*', 'users.name as responsible_name')
+            ->first();
+
+        return response()->json([
+            'activity' => $activity,
+            'status' => 200
+        ], 200);
+    }
 
     public function saveActivity(Request $request)
     {
@@ -42,19 +43,12 @@ class ActivityController extends Controller
                 'dependencies' => 'required',
                 'deliverables' => 'required',
             ], [
-                'category_id.required' => 'El id de la categoría es requerido.',
-                'name.required' => 'El nombre de la actividad es requerido.',
-                'description.required' => 'La descripción de la actividad es requerida.',
-                'start_date.required' => 'La fecha de inicio es requerida.',
-                'start_date.date' => 'La fecha de inicio no es válida.',
-                'end_date.required' => 'La fecha de finalización es requerida.',
-                'end_date.date' => 'La fecha de finalización no es válida.',
-                'end_date.after' => 'La fecha de finalización debe ser posterior a la fecha de inicio.',
-                'responsible_id.required' => 'El id del responsable es requerido.',
-                'dependencies.required' => 'Las dependencias de la actividad son requeridas.',
-                'deliverables.required' => 'Los entregables de la actividad son requeridos.',
+                // ... (tus mensajes de validación actuales)
             ]);
 
+            DB::beginTransaction();
+
+            // Insertar la nueva actividad
             DB::table('activities')->insert([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
@@ -68,18 +62,55 @@ class ActivityController extends Controller
                 'completion_percentage' => 0.00,
             ]);
 
+            // Obtener el project_id a través de la categoría
+            $category = DB::table('categories')->where('id', $request->category_id)->first();
+            $project_id = $category->project_id;
+
+            // Calcular el nuevo porcentaje del proyecto
+            $projectPercentage = $this->calculateProjectPercentage($project_id);
+
+            // Actualizar el porcentaje del proyecto
+            DB::table('projects')
+                ->where('id', $project_id)
+                ->update(['completion_percentage' => $projectPercentage]);
+
+            DB::commit();
+
             return response()->json(['message' => 'Actividad creada correctamente', 'status' => 200], 200);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
             return response()->json([
                 'message' => 'Error en la validación de datos',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'message' => 'Error al crear la actividad',
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function calculateProjectPercentage($project_id)
+    {
+        // Obtener todas las actividades del proyecto a través de sus categorías
+        $activities = DB::table('activities')
+            ->join('categories', 'activities.category_id', '=', 'categories.id')
+            ->where('categories.project_id', $project_id)
+            ->select('activities.completion_percentage')
+            ->get();
+
+        if ($activities->isEmpty()) {
+            return 0;
+        }
+
+        // Calcular el promedio de los porcentajes de todas las actividades
+        $totalPercentage = $activities->sum('completion_percentage');
+        $averagePercentage = $totalPercentage / $activities->count();
+
+        return round($averagePercentage, 2);
     }
 
     public function saveMessage(Request $request)
@@ -89,10 +120,10 @@ class ActivityController extends Controller
                 'content' => 'required',
                 'activity_id' => 'required',
             ], [
-                
+
                 'content.required' => 'El mensaje es requerido.',
                 'activity_id.required' => 'El activity_id es requerido.',
-                
+
             ]);
 
             DB::table('messages_activities')->insert([

@@ -35,7 +35,7 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::get('findOneUser/{id}', action: [UserController::class, 'findOne']);
     Route::post('saveUser', [UserController::class, 'saveUser']);
     Route::post('saveDepartment', [UserController::class, 'saveDepartment']);
-    Route::post('savePositions', [UserController::class, 'savePosition']);
+    Route::post('savePosition', [UserController::class, 'savePosition']);
     Route::put('updateUser/{id}', [UserController::class, 'updateUser']);
     Route::delete('deleteUser/{id}', [UserController::class, 'deleteUser']);
 
