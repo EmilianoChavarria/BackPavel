@@ -56,4 +56,6 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::put('updateSubactivity/{id}', [SubactivityController::class, 'updateSubactivity']);
     Route::delete('deleteSubactivity/{id}', [SubactivityController::class, 'deleteSubactivity']);
 
+    Route::post('save-or-update-by-id', [SubactivityController::class, 'saveOrUpdateMultipleById']);
+
 });

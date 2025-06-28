@@ -268,5 +268,105 @@ class SubactivityController extends Controller
         }
     }
 
+    public function saveOrUpdateMultipleById(Request $request)
+    {
+        try {
+            $request->validate([
+                'subactivities' => 'required|array',
+                'subactivities.*.id' => 'nullable|integer', // ID es opcional (para nuevas)
+                'subactivities.*.activity_id' => 'required|integer',
+                'subactivities.*.name' => 'required|string|max:255',
+                'subactivities.*.comment' => 'nullable|string',
+                'subactivities.*.status' => 'sometimes|in:completada,no completada',
+            ]);
+
+            DB::beginTransaction();
+
+            $activityIds = [];
+            $results = [];
+
+            foreach ($request->subactivities as $subactivityData) {
+                if (!empty($subactivityData['id'])) {
+                    // Verificar si existe la subactividad con este ID
+                    $exists = DB::table('subactivities')
+                        ->where('id', $subactivityData['id'])
+                        ->exists();
+
+                    if ($exists) {
+                        // Actualizar existente
+                        DB::table('subactivities')
+                            ->where('id', $subactivityData['id'])
+                            ->update([
+                                'name' => $subactivityData['name'],
+                                'comment' => $subactivityData['comment'] ?? null,
+                                'status' => $subactivityData['status'] ?? 'no completada'
+                                
+                            ]);
+
+                        $results[] = [
+                            'id' => $subactivityData['id'],
+                            'action' => 'updated',
+                            'name' => $subactivityData['name']
+                        ];
+                    } else {
+                        // ID proporcionado pero no existe - tratamos como nuevo
+                        $id = DB::table('subactivities')->insertGetId([
+                            'activity_id' => $subactivityData['activity_id'],
+                            'name' => $subactivityData['name'],
+                            'comment' => $subactivityData['comment'] ?? null,
+                            'status' => $subactivityData['status'] ?? 'no completada',
+                            
+                        ]);
+
+                        $results[] = [
+                            'id' => $id,
+                            'action' => 'created',
+                            'name' => $subactivityData['name']
+                        ];
+                    }
+                } else {
+                    // Crear nueva (sin ID)
+                    $id = DB::table('subactivities')->insertGetId([
+                        'activity_id' => $subactivityData['activity_id'],
+                        'name' => $subactivityData['name'],
+                        'comment' => $subactivityData['comment'] ?? null,
+                        'status' => $subactivityData['status'] ?? 'no completada'
+                    ]);
+
+                    $results[] = [
+                        'id' => $id,
+                        'action' => 'created',
+                        'name' => $subactivityData['name']
+                    ];
+                }
+
+                // Registrar activity_id para actualizar porcentajes
+                if (!in_array($subactivityData['activity_id'], $activityIds)) {
+                    $activityIds[] = $subactivityData['activity_id'];
+                }
+            }
+
+            // Actualizar porcentajes de actividades afectadas
+            foreach ($activityIds as $activityId) {
+                $this->updateActivityPercentage($activityId);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Subactividades procesadas correctamente',
+                'results' => $results,
+                'status' => 200
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error al procesar subactividades',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 }
