@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SubactivityController;
 use App\Http\Controllers\UserController;
@@ -57,5 +58,9 @@ Route::middleware([CorsMiddleware::class])->group(function () {
     Route::delete('deleteSubactivity/{id}', [SubactivityController::class, 'deleteSubactivity']);
 
     Route::post('save-or-update-by-id', [SubactivityController::class, 'saveOrUpdateMultipleById']);
+
+    // endpoints de comentarios
+    Route::get('getByActivity/{id}', [CommentController::class, 'getByActivity']);
+    Route::post('saveComment', [CommentController::class, 'saveMessage']);
 
 });
