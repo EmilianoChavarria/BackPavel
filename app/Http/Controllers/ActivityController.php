@@ -93,6 +93,70 @@ class ActivityController extends Controller
         }
     }
 
+    public function updateActivity(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'category_id' => 'required',
+                'name' => 'required',
+                'description' => 'required',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+                'responsible_id' => 'required',
+                'dependencies' => 'required',
+                'deliverables' => 'required',
+            ], [
+                'category_id.required' => 'La categoría es requerida.',
+                'name.required' => 'El nombre es requerido.',
+                'description.required' => 'La descripción es requerida.',
+                'start_date.required' => 'La fecha de inicio es requerida.',
+                'start_date.date' => 'La fecha de inicio debe ser una fecha válida.',
+                'end_date.required' => 'La fecha de fin es requerida.',
+                'end_date.date' => 'La fecha de fin debe ser una fecha válida.',
+                'end_date.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
+                'responsible_id.required' => 'El responsable es requerido.',
+                'dependencies.required' => 'Las dependencias son requeridas.',
+                'deliverables.required' => 'Los entregables son requeridos.',
+            ]);
+
+            DB::beginTransaction();
+
+            // Actualizar la actividad
+            DB::table('activities')
+                ->where('id', $id)
+                ->update([
+                    'category_id' => $request->category_id,
+                    'name' => $request->name,
+                    'description' => $request->description,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                    'responsible_id' => $request->responsible_id,
+                    'dependencies' => $request->dependencies,
+                    'deliverables' => $request->deliverables
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Actividad actualizada correctamente',
+                'status' => 200
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error al actualizar la actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     private function calculateProjectPercentage($project_id)
     {
         // Obtener todas las actividades del proyecto a través de sus categorías
